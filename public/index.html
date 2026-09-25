@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chaser 2.10.</title>
-<meta name="description" content="Yksi pullo. Yksi chaser. Ei tuplia.">
+<meta name="description" content="Yksi pullo. Yksi chaser. Paras kombinaatio voittaa.">
 <meta name="theme-color" content="#110c0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,7 +181,7 @@
   <header>
     <span class="eyebrow">Pe 2.10.</span>
     <h1>Chaser</h1>
-    <p class="tagline">Yksi pullo. Yksi chaser. Ei tuplia.</p>
+    <p class="tagline">Yksi pullo. Yksi chaser. Paras kombinaatio voittaa.</p>
   </header>
 
   <form id="dibsForm" autocomplete="off">
@@ -218,11 +218,9 @@
 
   // ---- intro ----
   const intro = $("intro");
-  let seen = false;
-  try { seen = sessionStorage.getItem("chaser-intro") === "1"; sessionStorage.setItem("chaser-intro", "1"); } catch {}
   const hideIntro = () => intro.classList.add("gone");
-  if (seen) intro.remove();
-  else { intro.addEventListener("click", hideIntro); setTimeout(hideIntro, 2900); }
+  intro.addEventListener("click", hideIntro);
+  setTimeout(hideIntro, 2900);
 
   // ---- board ----
   let known = new Set(), firstLoad = true;
