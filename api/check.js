@@ -1,4 +1,4 @@
-import { sql } from "../lib/db.js";
+import { readDibs } from "../lib/store.js";
 import { classify, norm } from "../lib/classify.js";
 
 export default async function handler(req, res) {
@@ -6,6 +6,6 @@ export default async function handler(req, res) {
   const q = String(req.query.q ?? "").trim();
   if (q.length < 2 || !norm(q)) return res.json({});
   const { key, label } = classify(q);
-  const rows = await sql`SELECT 1 FROM dibs WHERE category = ${key}`;
-  res.json({ label, taken: rows.length > 0 });
+  const { items } = await readDibs();
+  res.json({ label, taken: items.some((i) => i.category === key) });
 }

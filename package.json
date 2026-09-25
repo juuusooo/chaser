@@ -2,5 +2,7 @@
   "name": "chaser",
   "private": true,
   "type": "module",
-  "dependencies": { "@neondatabase/serverless": "^1.0.0" }
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
+  }
 }

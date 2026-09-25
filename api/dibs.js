@@ -1,4 +1,4 @@
-import { sql } from "../lib/db.js";
+import { updateDibs } from "../lib/store.js";
 import { classify, norm } from "../lib/classify.js";
 
 export default async function handler(req, res) {
@@ -8,11 +8,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Kirjoita viina (2–60 merkkiä)." });
   }
   const { key, label } = classify(drink);
-  const rows = await sql`
-    INSERT INTO dibs (category, label, drink, reserved_at)
-    VALUES (${key}, ${label}, ${drink}, ${Date.now()})
-    ON CONFLICT (category) DO NOTHING
-    RETURNING label`;
-  if (!rows.length) return res.status(409).json({ error: `${label} on jo dibsattu.`, label });
+  let taken = false;
+  await updateDibs((items) => {
+    taken = items.some((i) => i.category === key);
+    return taken ? null : [...items, { category: key, label, drink, reservedAt: Date.now() }];
+  });
+  if (taken) return res.status(409).json({ error: `${label} on jo dibsattu.`, label });
   res.json({ label });
 }
