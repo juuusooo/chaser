@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chaser 2.10.</title>
+<meta name="description" content="Yksi pullo. Yksi chaser. Ei tuplia.">
+<meta name="theme-color" content="#110c0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Limelight&family=Outfit:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #110c0a;
+    --surface: #1b1411;
+    --line: #34281f;
+    --text: #f3e7d3;
+    --muted: #978470;
+    --amber: #eaa43c;
+    --amber-deep: #a86417;
+    --red: #e0574b;
+    --display: "Limelight", "Didot", Georgia, serif;
+    --body: "Outfit", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse 80% 45% at 50% 0%, #2a1a0f 0%, transparent 70%);
+    background-attachment: fixed;
+    color: var(--text);
+    font: 400 16px/1.5 var(--body);
+    min-height: 100vh;
+    padding-inline: 16px;
+    padding-block: max(40px, env(safe-area-inset-top)) max(48px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+  /* ---------- header ---------- */
+  header { text-align: center; display: flex; flex-direction: column; gap: 6px; }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .2em; color: var(--amber); text-transform: uppercase; }
+  h1 {
+    font: 400 clamp(64px, 20vw, 104px)/0.9 var(--display);
+    margin: 8px 0 0; letter-spacing: .02em; text-transform: uppercase;
+    color: var(--text);
+    text-shadow: 0 0 28px rgba(234, 164, 60, .35);
+  }
+  .tagline { color: var(--muted); margin: 0; font-size: 15px; }
+
+  /* ---------- form ---------- */
+  form { display: flex; flex-direction: column; gap: 10px; }
+  label[for="drink"] { font-weight: 600; font-size: 18px; }
+  .row { display: flex; gap: 8px; }
+  input {
+    flex: 1; min-width: 0;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 14px; font: 400 17px var(--body);
+    outline: none; transition: border-color .15s;
+  }
+  input::placeholder { color: #6b5b4b; }
+  input:focus-visible { border-color: var(--amber); }
+  button {
+    font: 600 15px var(--body); letter-spacing: .08em; text-transform: uppercase;
+    border: 0; border-radius: 10px; cursor: pointer; padding: 14px 18px;
+    background: var(--amber); color: #1a0f05;
+    transition: transform .1s, background .15s;
+  }
+  button:hover { background: #f4b556; }
+  button:active { transform: scale(.97); }
+  button:disabled { opacity: .5; cursor: default; }
+  button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 8px 12px; font-size: 12px; }
+  button.ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .hint { min-height: 22px; font-size: 14px; color: var(--muted); margin: 0; }
+  .hint .ok { color: var(--amber); }
+  .hint .no { color: var(--red); }
+  .fine { font-size: 13px; color: var(--muted); margin: 0; }
+
+  .flash { border-radius: 12px; padding: 14px 16px; font-size: 15px; animation: pop .35s ease-out; }
+  .flash.err { background: rgba(224, 87, 75, .1); border: 1px solid rgba(224, 87, 75, .4); }
+  .flash.err strong { color: var(--red); }
+  .flash.ok { background: var(--surface); border: 1px solid var(--amber-deep); }
+  .flash.ok strong { color: var(--amber); }
+  @keyframes pop { from { transform: translateY(6px); opacity: 0; } }
+
+  /* ---------- board ---------- */
+  .board h2 { font: 500 12px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  li {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 4px; border-bottom: 1px solid var(--line);
+    font-size: 20px; font-weight: 500;
+  }
+  li.new { animation: pop .5s ease-out; }
+  .tick {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--amber); color: #1a0f05;
+    display: grid; place-items: center; font-size: 15px; font-weight: 700;
+  }
+  li .what { min-width: 0; overflow-wrap: anywhere; }
+  .del {
+    margin-left: auto; flex: none; width: 34px; height: 34px; padding: 0; border-radius: 50%;
+    background: transparent; color: var(--muted); font-size: 20px; letter-spacing: 0;
+    border: 1px solid transparent;
+  }
+  .del:hover { background: transparent; color: var(--red); border-color: var(--line); }
+  .empty { color: var(--muted); padding: 18px 4px; border-bottom: 1px solid var(--line); }
+
+  /* ---------- confirm ---------- */
+  .modal {
+    position: fixed; inset: 0; z-index: 5; padding: 16px;
+    background: rgba(8, 5, 4, .75); backdrop-filter: blur(4px);
+    display: grid; place-items: center; animation: fade .2s ease;
+  }
+  .modal[hidden] { display: none; }
+  .modal .card {
+    width: 100%; max-width: 340px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; gap: 8px; animation: pop .25s ease-out;
+  }
+  .modal h3 { margin: 0; font-size: 20px; font-weight: 600; }
+  .modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+  .modal .actions .ghost { padding: 12px 16px; font-size: 14px; }
+  button.danger { background: var(--red); color: #fff; }
+  button.danger:hover { background: #ec6a5f; }
+
+  /* ---------- intro ---------- */
+  #intro {
+    position: fixed; inset: 0; z-index: 10; background: var(--bg);
+    display: grid; place-items: center; cursor: pointer;
+    transition: opacity .6s ease, visibility .6s;
+  }
+  #intro.gone { opacity: 0; visibility: hidden; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .glass { width: 74px; height: 96px; }
+  .glass .liquid { transform: translateY(100%); animation: fill 1s cubic-bezier(.5, 0, .2, 1) .15s forwards; }
+  .glass { animation: knock .5s cubic-bezier(.6, 0, .4, 1) 1.2s forwards; transform-origin: 50% 90%; }
+  @keyframes fill { to { transform: translateY(0); } }
+  @keyframes knock { 40% { transform: rotate(-14deg) translateY(-4px); } 100% { transform: rotate(0) translateY(0) scale(.9); opacity: .0; } }
+  .word { display: flex; font: 400 clamp(56px, 17vw, 96px)/1 var(--display); letter-spacing: .02em; }
+  .word span {
+    opacity: 0; filter: blur(8px); transform: translateY(18px);
+    animation: letter .55s cubic-bezier(.2, .7, .2, 1) forwards;
+    animation-delay: calc(1.35s + var(--i) * 70ms);
+    text-shadow: 0 0 30px rgba(234, 164, 60, .55);
+  }
+  @keyframes letter { to { opacity: 1; filter: blur(0); transform: none; } }
+  .stage .sub { font: 500 12px/1 var(--mono); letter-spacing: .3em; color: var(--amber); text-transform: uppercase; opacity: 0; animation: fade .5s ease 2s forwards; }
+  @keyframes fade { to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    #intro { display: none; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+  <div class="stage">
+    <svg class="glass" viewBox="0 0 74 96" fill="none">
+      <defs>
+        <clipPath id="cup"><path d="M6 6 L68 6 L60 88 L14 88 Z"/></clipPath>
+      </defs>
+      <g clip-path="url(#cup)">
+        <rect class="liquid" x="0" y="24" width="74" height="72" fill="#eaa43c"/>
+      </g>
+      <path d="M6 6 L68 6 L60 88 L14 88 Z" stroke="#f3e7d3" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M14 88 L60 88" stroke="#f3e7d3" stroke-width="6"/>
+    </svg>
+    <div class="word"><span style="--i:0">C</span><span style="--i:1">H</span><span style="--i:2">A</span><span style="--i:3">S</span><span style="--i:4">E</span><span style="--i:5">R</span></div>
+    <div class="sub">2.10.</div>
+  </div>
+</div>
+
+<main>
+  <header>
+    <span class="eyebrow">Pe 2.10.</span>
+    <h1>Chaser</h1>
+    <p class="tagline">Yksi pullo. Yksi chaser. Ei tuplia.</p>
+  </header>
+
+  <form id="dibsForm" autocomplete="off">
+    <label for="drink">Mitä tuot?</label>
+    <div class="row">
+      <input id="drink" name="drink" maxlength="60" placeholder="esim. Don Julio Reposado" required>
+      <button type="submit" id="dibsBtn">Dibsaa</button>
+    </div>
+    <p class="hint" id="hint" aria-live="polite"></p>
+  </form>
+
+  <div id="flash" aria-live="polite"></div>
+
+  <section class="board">
+    <h2>Dibsattu · <span id="count">0</span></h2>
+    <ul id="list"></ul>
+  </section>
+</main>
+
+<div id="confirm" class="modal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h3 id="confirmTitle"></h3>
+    <p class="fine">Se vapautuu muille dibsattavaksi.</p>
+    <div class="actions">
+      <button type="button" class="ghost" id="confirmNo">Peruuta</button>
+      <button type="button" class="danger" id="confirmYes">Poista</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // ---- intro ----
+  const intro = $("intro");
+  let seen = false;
+  try { seen = sessionStorage.getItem("chaser-intro") === "1"; sessionStorage.setItem("chaser-intro", "1"); } catch {}
+  const hideIntro = () => intro.classList.add("gone");
+  if (seen) intro.remove();
+  else { intro.addEventListener("click", hideIntro); setTimeout(hideIntro, 2900); }
+
+  // ---- board ----
+  let known = new Set(), firstLoad = true;
+
+  function render(data) {
+    $("count").textContent = data.items.length;
+    const list = $("list");
+    list.replaceChildren();
+    if (!data.items.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "Ei vielä dibsejä. Ole eka.";
+      list.append(li);
+    }
+    for (const it of data.items) {
+      const li = document.createElement("li");
+      if (!firstLoad && !known.has(it.label)) li.className = "new";
+      const tick = document.createElement("span");
+      tick.className = "tick"; tick.textContent = "✓";
+      const what = document.createElement("span");
+      what.className = "what"; what.textContent = it.label;
+      const del = document.createElement("button");
+      del.type = "button"; del.className = "del"; del.textContent = "×";
+      del.setAttribute("aria-label", `Poista ${it.label}`);
+      del.addEventListener("click", () => askDelete(it.label));
+      li.append(tick, what, del);
+      list.append(li);
+    }
+    known = new Set(data.items.map((i) => i.label));
+    firstLoad = false;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("/api/board", { cache: "no-store" });
+      if (res.ok) render(await res.json());
+    } catch {}
+  }
+
+  let flashTimer;
+  function flash(kind, text, strong) {
+    clearTimeout(flashTimer);
+    const box = document.createElement("div");
+    box.className = "flash " + kind;
+    const b = document.createElement("strong");
+    b.textContent = strong;
+    box.append(b);
+    if (text) box.append(document.createElement("br"), text);
+    $("flash").replaceChildren(box);
+    flashTimer = setTimeout(() => $("flash").replaceChildren(), 5000);
+  }
+
+  // ---- live check while typing ----
+  let checkTimer, checkSeq = 0;
+  $("drink").addEventListener("input", (e) => {
+    clearTimeout(checkTimer);
+    const q = e.target.value.trim();
+    if (q.length < 2) { $("hint").textContent = ""; return; }
+    checkTimer = setTimeout(async () => {
+      const seq = ++checkSeq;
+      try {
+        const res = await fetch("/api/check?q=" + encodeURIComponent(q));
+        const r = await res.json();
+        if (seq !== checkSeq || !r.label) return;
+        const span = document.createElement("span");
+        span.className = r.taken ? "no" : "ok";
+        span.textContent = r.taken ? `${r.label} · jo dibsattu` : `${r.label} · vapaa`;
+        $("hint").replaceChildren("Näkyy muille: ", span);
+      } catch {}
+    }, 250);
+  });
+
+  // ---- dibs ----
+  $("dibsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("dibsBtn");
+    btn.disabled = true;
+    try {
+      const res = await fetch("/api/dibs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ drink: $("drink").value }),
+      });
+      const r = await res.json();
+      if (res.ok) {
+        flash("ok", "", `✓ ${r.label} dibsattu.`);
+        $("drink").value = ""; $("hint").textContent = "";
+      } else if (res.status === 409) {
+        flash("err", "Valitse jotain muuta, cowboy.", `❌ ${r.label} on jo dibsattu.`);
+      } else {
+        flash("err", "", r.error || "Jokin meni pieleen.");
+      }
+    } catch {
+      flash("err", "Kokeile uudestaan.", "Ei yhteyttä.");
+    }
+    btn.disabled = false;
+    load();
+  });
+
+  // ---- delete with confirm ----
+  let pending = null;
+  function askDelete(label) {
+    pending = label;
+    $("confirmTitle").textContent = `Poistetaanko ${label}?`;
+    $("confirm").hidden = false;
+    $("confirmNo").focus();
+  }
+  function closeConfirm() { $("confirm").hidden = true; pending = null; }
+  $("confirmNo").addEventListener("click", closeConfirm);
+  $("confirm").addEventListener("click", (e) => { if (e.target === $("confirm")) closeConfirm(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("confirm").hidden) closeConfirm(); });
+  $("confirmYes").addEventListener("click", async () => {
+    const label = pending;
+    closeConfirm();
+    try {
+      const res = await fetch("/api/undibs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ label }),
+      });
+      const r = await res.json();
+      if (res.ok) flash("ok", "", `${r.label} poistettu.`);
+      else flash("err", "", r.error || "Jokin meni pieleen.");
+    } catch {
+      flash("err", "Kokeile uudestaan.", "Ei yhteyttä.");
+    }
+    load();
+  });
+
+  load();
+  setInterval(load, 10000);
+})();
+</script>
+</body>
+</html>

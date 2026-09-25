@@ -1,0 +1,11 @@
+{
+  "name": "chaser",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:local": "wrangler d1 execute chaser --local --file=schema.sql",
+    "db:remote": "wrangler d1 execute chaser --remote --file=schema.sql",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": { "wrangler": "^4.141.0" }
+}
